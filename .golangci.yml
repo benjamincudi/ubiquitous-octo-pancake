@@ -1,0 +1,13 @@
+run:
+  go: '1.19'
+linters:
+  enable:
+    - unparam
+    - unused
+  disable:
+    - typecheck
+linters-settings:
+  govet:
+    check-shadowing: true
+    disable:
+      - composites
