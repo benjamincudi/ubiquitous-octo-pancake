@@ -13,6 +13,28 @@ type withdrawDS interface {
 	Withdraw(ctx context.Context, info datastore.WithdrawalInfo) error
 }
 
+type AccountWithdraw struct {
+	DS withdrawDS
+}
+
+func (ctrl AccountWithdraw) HandlePost(c *gin.Context) {
+	var form datastore.WithdrawalInfo
+	if err := c.Bind(&form); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+	}
+	if user, err := userFromContext(c); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	} else {
+		form.PersonalAccountNumber = user.PersonalAccountNumber
+	}
+	// These should really be 400 errors, but we're engaging in shenanigans to avoid using any JS
+	if err := ctrl.DS.Withdraw(c, form); err != nil {
+		c.SetCookie("withdrawError", err.Error(), 60, "", "", true, true)
+	}
+	c.Redirect(http.StatusSeeOther, "/account")
+}
+
 type QuickWithdrawController struct {
 	DS withdrawDS
 }
