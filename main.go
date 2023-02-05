@@ -1,6 +1,8 @@
 package main
 
 import (
+	"atillm/api"
+	"atillm/web"
 	"context"
 	"log"
 	"net/http"
@@ -21,6 +23,9 @@ func main() {
 	if err := r.SetTrustedProxies(nil); err != nil {
 		log.Fatal(err)
 	}
+
+	api.AttachApiHandlers(r)
+	web.AttachWebRoutes(r)
 
 	srv := &http.Server{Addr: ":80", Handler: r}
 
