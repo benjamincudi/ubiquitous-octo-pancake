@@ -4,14 +4,16 @@ import (
 	"atillm/api/handlers"
 	"atillm/datastore"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"reflect"
+
+	"github.com/gin-gonic/gin"
 )
 
 func AttachApiHandlers(r gin.IRoutes) {
 	ds := datastore.NewMemoryDS()
 	routeMap := gin.H{
 		"/api/withdraw": handlers.QuickWithdrawController{ds},
+		"/api/reset":    handlers.ResetController{ds},
 	}
 	mapRoutesToHandlers(r, routeMap)
 }
