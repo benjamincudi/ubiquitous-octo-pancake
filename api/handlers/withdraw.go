@@ -30,7 +30,7 @@ func (ctrl QuickWithdrawController) HandlePost(c *gin.Context) {
 		// error to the client, but since we're doing this without any client-side JS,
 		// we're engaging in some cookie shenanigans to show the error
 		switch err.(type) {
-		case datastore.ErrTooLarge, datastore.ErrDailyAmount, datastore.ErrDailyUsage:
+		case datastore.ErrTooLarge, datastore.ErrDailyAmount, datastore.ErrDailyUsage, datastore.ErrATMSupply:
 			c.SetCookie("withdrawError", base64.StdEncoding.EncodeToString([]byte(err.Error())), 1, "", "", true, true)
 		default:
 			_ = c.Error(err)
