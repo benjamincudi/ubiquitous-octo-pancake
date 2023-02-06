@@ -4,6 +4,7 @@ import (
 	"atillm/datastore"
 	"context"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,8 @@ func (ctrl QuickWithdrawController) HandlePost(c *gin.Context) {
 			_ = c.Error(err)
 			c.SetCookie("withdrawError", base64.StdEncoding.EncodeToString([]byte("Oops, something went wrong. Please try again.")), 1, "", "", true, true)
 		}
+	} else {
+		c.SetCookie("withdrawSuccess", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("We've dispatched a rat to bring your $%d.", form.Amount))), 1, "", "", true, true)
 	}
 	// Normally this would be more like c.JSON(http.StatusOK, someResponseStruct)
 	// but since we're just using built-in form behavior, we want to redirect the

@@ -32,27 +32,53 @@ func AttachWebRoutes(e *gin.Engine) {
 	log.Println("using embedded files - rebuild to get changes")
 
 	e.GET("/", func(c *gin.Context) {
-		errMsg, err := getWithdrawError(c)
+		res, err := getWithdrawRes(c)
 		if err != nil && !errors.Is(err, http.ErrNoCookie) {
 			c.SetCookie("withdrawError", "", 0, "", "", true, true)
+			c.SetCookie("withdrawSuccess", "", 0, "", "", true, true)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c.SetCookie("withdrawError", "", 0, "", "", true, true)
 		c.HTML(http.StatusOK, "index.gohtml", gin.H{
-			"error": errMsg,
+			"error":   res.errMsg,
+			"success": res.success,
 		})
 	})
 }
 
-func getWithdrawError(c *gin.Context) (string, error) {
+type withdrawResult struct {
+	errMsg, success string
+}
+
+func getWithdrawRes(c *gin.Context) (withdrawResult, error) {
+	var errMsg, success string
 	eCookie, err := c.Request.Cookie("withdrawError")
-	if err != nil {
-		return "", err
+	switch err {
+	case http.ErrNoCookie:
+	case nil:
+		msg, decodeErr := base64.StdEncoding.DecodeString(eCookie.Value)
+		if decodeErr != nil {
+			log.Printf("b64 decode error: %v\n", decodeErr)
+		}
+		errMsg = string(msg)
+	default:
+		return withdrawResult{}, err
 	}
-	b, err := base64.StdEncoding.DecodeString(eCookie.Value)
-	if err != nil {
-		log.Printf("b64 decode error: %v\n", err)
+
+	eCookie, err = c.Request.Cookie("withdrawSuccess")
+	switch err {
+	case http.ErrNoCookie:
+	case nil:
+		msg, decodeErr := base64.StdEncoding.DecodeString(eCookie.Value)
+		if decodeErr != nil {
+			log.Printf("b64 decode error: %v\n", decodeErr)
+		}
+		success = string(msg)
+	default:
+		return withdrawResult{}, err
 	}
-	return string(b), err
+	return withdrawResult{
+		errMsg,
+		success,
+	}, err
 }
