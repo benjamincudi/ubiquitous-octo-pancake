@@ -7,13 +7,13 @@
 </head>
 <body>
 <h1 class="logo">
-  <span>A</span>
-  <span>T</span>
-  <span>M</span>
-  <span>ill</span>
+  ATillM
 </h1>
-{{ if gt (len .error) 1 }}
+{{ if gt (len .error) 0 }}
 <div class="error">{{ .error }}</div>
+{{ end }}
+{{ if gt (len .success) 0 }}
+  <div class="success">{{ .success }}</div>
 {{ end }}
 <form action="/api/withdraw" method="post">
   <label for="pan">Personal Account Number</label>

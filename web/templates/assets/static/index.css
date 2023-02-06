@@ -20,30 +20,16 @@ input {
 }
 input:user-invalid:not(:focus) {
     border-color: red;
-    outline: none
+    outline: none;
 }
 input:valid:not(:focus) {
     border-color: green;
-    outline: none
+    outline: none;
 }
 
-.logo {
-    display: grid;
-    grid-template-columns: max-content max-content max-content;
-    grid-template-areas: "A" "T" "M";
-    align-items: start;
+.error {
+    color: darkred;
 }
-
-.logo span {
-    font-size: 30px;
-}
-
-.logo span:nth-child(2) {
-    font-size: 53px;
-}
-
-.logo span:last-child {
-    grid-column-start: 3;
-    font-size: 12px;
-    margin-top: -23px;
+.success {
+    color: darkgreen;
 }
