@@ -9,8 +9,8 @@ type MemoryDS struct {
 	dailyUsage map[int]dailyAccountUsage
 }
 
-func NewMemoryDS() MemoryDS {
-	return MemoryDS{map[int]dailyAccountUsage{}}
+func NewMemoryDS() *MemoryDS {
+	return &MemoryDS{map[int]dailyAccountUsage{}}
 }
 
 func (ds MemoryDS) getRemainingSupply() int {
@@ -79,5 +79,11 @@ func (ds MemoryDS) Withdraw(_ context.Context, info WithdrawalInfo) error {
 		amount:      usage.amount + info.Amount,
 		withdrawals: usage.withdrawals + 1,
 	}
+	return nil
+}
+
+func (ds *MemoryDS) ResetDay(_ context.Context) error {
+	ds.dailyUsage = map[int]dailyAccountUsage{}
+
 	return nil
 }
