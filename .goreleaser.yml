@@ -16,6 +16,8 @@ builds:
     binary: atillm
     tags:
       - nomsgpack
+    ldflags:
+      - -s -w
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
