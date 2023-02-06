@@ -1,3 +1,6 @@
+html, body {
+    height: 100%;
+}
 body {
     display: flex;
     flex-direction: column;
@@ -32,4 +35,8 @@ input:valid:not(:focus) {
 }
 .success {
     color: darkgreen;
+}
+
+form + form {
+    margin: auto 0;
 }
