@@ -9,13 +9,8 @@
 <h1 class="logo">
   ATillM
 </h1>
-{{ if gt (len .error) 0 }}
-<div class="error">{{ .error }}</div>
-{{ end }}
-{{ if gt (len .success) 0 }}
-  <div class="success">{{ .success }}</div>
-{{ end }}
-<form action="/api/withdraw" method="post">
+<div class="message">&nbsp;</div>
+<form id="withdraw" action="/api/withdraw" method="post">
   <label for="pan">Personal Account Number</label>
   <input type="text" id="pan" name="pan" pattern="\d+" required />
   <label for="amount">Amount</label>
@@ -25,5 +20,28 @@
 <form action="/api/reset" method="post">
   <button type="submit">Time travel to tomorrow</button>
 </form>
+<script>
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      const messageNode = document.querySelector('.message');
+      fetch('/api/withdraw', {
+          method: 'POST',
+          mode: 'cors',
+          credentials: 'same-origin',
+          body: new FormData(document.forms['withdraw'])
+      }).then(async (res) => {
+          const data = await res.json();
+          messageNode.textContent = data.message;
+          messageNode.classList.add(res.ok ? 'success' : 'error');
+          messageNode.classList.remove(!res.ok ? 'success' : 'error');
+          if (res.ok) {
+              document.forms['withdraw'].reset();
+          }
+      }, async (err) => {
+          console.error(err);
+      });
+  }
+  document.forms['withdraw'].addEventListener('submit', handleSubmit);
+</script>
 </body>
 </html>

@@ -3,7 +3,6 @@ package handlers
 import (
 	"atillm/datastore"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 
@@ -26,21 +25,14 @@ func (ctrl QuickWithdrawController) HandlePost(c *gin.Context) {
 	}
 
 	if err := ctrl.DS.Withdraw(c, form); err != nil {
-		// Normally we would want to use AbortWithError or be returning a meaningful
-		// error to the client, but since we're doing this without any client-side JS,
-		// we're engaging in some cookie shenanigans to show the error
 		switch err.(type) {
 		case datastore.ErrTooLarge, datastore.ErrDailyAmount, datastore.ErrDailyUsage, datastore.ErrATMSupply:
-			c.SetCookie("withdrawError", base64.StdEncoding.EncodeToString([]byte(err.Error())), 1, "", "", true, true)
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		default:
 			_ = c.Error(err)
-			c.SetCookie("withdrawError", base64.StdEncoding.EncodeToString([]byte("Oops, something went wrong. Please try again.")), 1, "", "", true, true)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Oops! Something went wrong, please try again."})
 		}
 	} else {
-		c.SetCookie("withdrawSuccess", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("We've dispatched a rat to bring your $%d.", form.Amount))), 1, "", "", true, true)
+		c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("We've dispatched a rat to bring your $%d.", form.Amount)})
 	}
-	// Normally this would be more like c.JSON(http.StatusOK, someResponseStruct)
-	// but since we're just using built-in form behavior, we want to redirect the
-	// browser back to a friendly view instead
-	c.Redirect(http.StatusSeeOther, "/")
 }
